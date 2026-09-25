@@ -1,0 +1,64 @@
+Practica 1: Instalacion del Sistema Operativo RedHat
+cat /etc/redhat-release
+
+-----------------------------------------------------------------------
+
+Practica 2: Configuración de parametros de red
+nmcli con show
+sudo nmtui
+sudo systemctl restart NetworkManager
+sudo nmcli con mod ens160 ipv4.method auto
+sudo nmcli con up ens160
+sudo nmcli con mod ens160 ipv4.addresses 192.168.1.50/24
+sudo nmcli con mod ens160 ipv4.gateway 192.168.1.1
+sudo nmcli con mod ens160 ipv4.method manual
+ip addr show ens160
+ip route
+sudo cat /etc/NetworkManager/system-connections/ens160.nmconnection
+sudo nmcli con reload
+sudo nmcli con mod ens160 ipv4.dns "8.8.8.8 8.8.4.4"
+
+-----------------------------------------------------------------------
+
+Practica 3: Gestion de Usuario y grupos
+sudo useradd jean
+sudo passwd jean
+sudo usermod -aG wheel jean
+groups jean
+id jean
+sudo groupadd guest
+sudo useradd usuario_guest
+sudo usermod -aG guest usuario_guest
+groups usuario_guest
+sudo userdel -r usuario_guest
+sudo groupdel guest
+
+
+-----------------------------------------------------------------------
+
+Practica 4: Gestion de Permisos de archivos
+
+mkdir materia
+cd materia
+vi estudiante.txt
+chmod 700 estudiante.txt
+ls -l estudiante.txt
+chmod 070 estudiante.txt
+cd
+mkdir materia2
+sudo cp materia/estudiante.txt materia2/
+sudo ls materia2/
+sudo rm -r materia
+ls
+
+
+
+
+
+
+
+
+
+
+
+
