@@ -1,0 +1,33 @@
+Video 1: Gestión de paquetes y repositorios
+sudo dnf update -y
+sudo dnf upgrade -y
+dnf repolist
+dnf search bashtop
+sudo dnf install git make gcc python3-psutil -y
+git clone https://github.com/aristocratos/bashtop.git
+cd bashtop
+sudo make install
+bashtop
+sudo make uninstall
+sudo rm -rf ~/.config/bashtop
+sudo dnf autoremove -y
+
+
+
+
+Video 2: Tareas programadas (cron y at)
+sudo dnf install cronie at -y
+sudo systemctl enable --now crond
+sudo systemctl enable --now atd
+Cron job de actualización (11 p.m.):
+sudo crontab
+0 23 * * * /usr/bin/dnf update -y
+
+Cron job de reinicio (domingos 3 a.m.):
+sudo crontab -e
+0 3 * * 0 /usr/sbin/shutdown -r now
+
+Tarea con at:
+touch /tmp/prueba1.txt /tmp/prueba2.txt /tmp/prueba3.txt
+ls /tmp
+echo "rm -rf /tmp/*" | sudo at now + 1 minute
