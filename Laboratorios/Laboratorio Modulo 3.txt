@@ -1,0 +1,113 @@
+Jean Carlos Ogando Galán — Matrícula: 2023-0797
+=========================================================
+VIDEO 1 — APACHE
+=========================================================
+
+sudo dnf install httpd -y
+sudo systemctl enable --now httpd
+
+sudo mkdir -p /var/www/hola
+sudo nano /var/www/hola/index.html
+
+DENTRO DE NANO — /var/www/hola/index.html:
+<h1>Hola Mundo</h1>
+
+sudo mkdir -p /var/www/datos
+sudo nano /var/www/datos/index.html
+
+DENTRO DE NANO — /var/www/datos/index.html:
+<h1>Jean Carlos Ogando Galan</h1>
+<h2>Matricula: 2023-0797</h2>
+<h2>Materia: Sistemas Operativos</h2>
+
+sudo nano /etc/httpd/conf.d/practica.conf
+
+/etc/httpd/conf.d/practica.conf:
+Listen 8080
+
+<VirtualHost *:80>
+DocumentRoot "/var/www/hola"
+<Directory "/var/www/hola">
+Require all granted
+</Directory>
+</VirtualHost>
+
+<VirtualHost *:8080>
+DocumentRoot "/var/www/datos"
+<Directory "/var/www/datos">
+Require all granted
+</Directory>
+</VirtualHost>
+
+sudo semanage port -a -t http_port_t -p tcp 8080
+
+sudo restorecon -Rv /var/www/
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-port=8080/tcp
+sudo firewall-cmd --reload
+sudo systemctl restart httpd
+
+=========================================================
+VIDEO 2 — POSTFIX CON GMAIL
+=========================================================
+
+sudo hostnamectl set-hostname redhat-jean.localdomain
+sudo su
+
+dnf install postfix cyrus-sasl cyrus-sasl-plain s-nail nano -y
+systemctl enable --now postfix
+
+# PEGAR EN LA TERMINAL, NO EN NANO:
+postconf -e \
+'myhostname = redhat-jean.localdomain' \
+'mydomain = localdomain' \
+'myorigin = $myhostname' \
+'inet_interfaces = loopback-only' \
+'inet_protocols = ipv4' \
+'mynetworks = 127.0.0.0/8' \
+'relayhost = [smtp.gmail.com]:587' \
+'smtp_sasl_auth_enable = yes' \
+'smtp_sasl_security_options = noanonymous' \
+'smtp_tls_security_level = encrypt' \
+'smtp_sasl_password_maps = lmdb:/etc/postfix/sasl_passwd'
+
+umask 077
+nano /etc/postfix/sasl_passwd
+
+DENTRO DE NANO — /etc/postfix/sasl_passwd:
+[smtp.gmail.com]:587 jeancarlosogandogalan@gmail.com:TU_CONTRASENA_DE_APLICACION
+
+
+chown root:root /etc/postfix/sasl_passwd
+chmod 600 /etc/postfix/sasl_passwd
+postmap lmdb:/etc/postfix/sasl_passwd
+chown root:root /etc/postfix/sasl_passwd.lmdb
+chmod 600 /etc/postfix/sasl_passwd.lmdb
+systemctl restart postfix
+
+
+printf 'Nombre: Jean Carlos Ogando Galán\nMatricula: 2023-0797\n' | mailx -r jeancarlosogandogalan@gmail.com -s "MambruSeFueALaGuerra" os3conadrian@gmail.com
+
+=========================================================
+VIDEO 3 — CUPS + IMPRESORA VIRTUAL PDF
+=========================================================
+
+sudo su
+
+dnf install cups cups-client -y
+dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-10.noarch.rpm -y
+dnf install cups-pdf ghostscript -y
+systemctl enable --now cups
+
+
+lpadmin -p PDF -E -v cups-pdf:/ -P /usr/share/cups/model/CUPS-PDF_opt.ppd -o printer-is-shared=true
+
+cupsctl --share-printers
+firewall-cmd --permanent --add-port=631/tcp
+firewall-cmd --reload
+systemctl restart cups
+
+
+
+
+
